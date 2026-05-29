@@ -338,16 +338,26 @@ function renderCharts(data) {
                     hoverOffset: 10
                 }]
             },
-            options: {
+            
+        options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 5,
+                        bottom: 10,
+                        left: 10,
+                        right: 10
+                    }
+                },
                 plugins: {
                     legend: {
-                        position: "right",
+                        position: "bottom",
                         labels: {
                             color: "#9ca3af",
                             font: { family: "Outfit", size: 10 },
-                            boxWidth: 10
+                            boxWidth: 8,
+                            padding: 10
                         }
                     },
                     tooltip: {
