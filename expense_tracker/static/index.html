@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker // Premium Budgeting & Analytics</title>
+    
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-logo">
+                    <span class="logo-dot"></span>
+                </div>
+                <h1>Expense Tracker</h1>
+                <span class="badge">v1.0</span>
+            </div>
+            <div class="header-action">
+                <span id="current-time-badge" class="time-badge">Syncing...</span>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Layout -->
+        <main class="dashboard-grid">
+
+            <!-- Left Panel: Logging & Info -->
+            <section class="left-panel">
+                
+                <!-- Quick Log Card -->
+                <div class="glass-card log-expense-card">
+                    <div class="card-header">
+                        <span class="card-icon">⚡</span>
+                        <h2>Log New Expense</h2>
+                    </div>
+                    <p class="card-subtitle">Record your expenditures seamlessly with details and notes.</p>
+                    
+                    <form id="expense-form" class="app-form" onsubmit="event.preventDefault();">
+                        <!-- Transaction Type Toggle -->
+                        <div class="form-group">
+                            <label>Transaction Type</label>
+                            <div class="type-selector-pills">
+                                <button type="button" id="type-expense-btn" class="type-pill active">Expense</button>
+                                <button type="button" id="type-income-btn" class="type-pill">Income</button>
+                            </div>
+                            <input type="hidden" id="type-input" value="expense">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group amount-group">
+                                <label for="amount-input">Amount ($)</label>
+                                <div class="input-wrapper-amount">
+                                    <span class="currency-symbol">$</span>
+                                    <input type="number" id="amount-input" step="0.01" min="0.01" placeholder="0.00" required autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-group date-group">
+                                <label for="date-input">Date</label>
+                                <input type="date" id="date-input" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category-select">Category</label>
+                            <select id="category-select" required>
+                                <option value="" disabled selected>Select a category</option>
+                                <option value="Food & Dining">🍔 Food & Dining</option>
+                                <option value="Transport & Fuel">🚗 Transport & Fuel</option>
+                                <option value="Rent & Utilities">🏠 Rent & Utilities</option>
+                                <option value="Entertainment & Leisure">🎬 Entertainment & Leisure</option>
+                                <option value="Shopping & Apparel">🛍️ Shopping & Apparel</option>
+                                <option value="Health & Medical">🏥 Health & Medical</option>
+                                <option value="Education">🎓 Education</option>
+                                <option value="Investments & Business">💼 Investments & Business</option>
+                                <option value="Others">🏷️ Others</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes-input">Notes (Optional)</label>
+                            <textarea id="notes-input" placeholder="Add specific details or descriptors..." rows="3" maxlength="200"></textarea>
+                        </div>
+
+                        <button type="submit" id="add-expense-btn" class="btn btn-primary">
+                            <span>Add Record</span>
+                            <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Info summary widget -->
+                <div class="glass-card promo-card">
+                    <h3>💡 Expense Wisdom</h3>
+                    <p id="wisdom-quote">"Do not save what is left after spending, but spend what is left after saving." - Warren Buffett</p>
+                </div>
+            </section>
+
+            <!-- Right Panel: Summary & Analytics -->
+            <section class="right-panel">
+
+                <!-- Summary Cards Panel -->
+                <div class="summary-cards-container">
+                    <div class="glass-card stat-card total-income-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Total Incoming</span>
+                            <span class="stat-emoji">📈</span>
+                        </div>
+                        <div class="stat-value" id="total-income-val">$0.00</div>
+                        <div class="stat-footer">
+                            <span class="trend-indicator up" id="total-income-desc">Cumulative Deposits</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card stat-card total-expense-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Total Outgoing</span>
+                            <span class="stat-emoji">📉</span>
+                        </div>
+                        <div class="stat-value" id="total-expense-val">$0.00</div>
+                        <div class="stat-footer">
+                            <span class="trend-indicator" id="total-expense-desc">Cumulative Expenditures</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card stat-card net-balance-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Net Balance</span>
+                            <span class="stat-emoji">⚖️</span>
+                        </div>
+                        <div class="stat-value" id="net-balance-val">$0.00</div>
+                        <div class="stat-footer">
+                            <span class="trend-indicator" id="net-balance-desc">Current financial standing</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytical Visualizations -->
+                <div class="analytics-row">
+                    <!-- Chart 1: Category Breakdown -->
+                    <div class="glass-card chart-card category-breakdown-chart">
+                        <div class="card-header">
+                            <h3>Category Breakdown</h3>
+                            <span class="chart-type-badge">Doughnut</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                        <div id="no-category-data" class="no-data-overlay">
+                            <p>No transaction history to display category breakdown.</p>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Monthly Trends -->
+                    <div class="glass-card chart-card monthly-trend-chart">
+                        <div class="card-header">
+                            <h3>Month-Wise Trend</h3>
+                            <span class="chart-type-badge">Line Trend</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                        <div id="no-trend-data" class="no-data-overlay">
+                            <p>No monthly timeline logs discovered.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expense Logs & History List -->
+                <div class="glass-card logs-table-card">
+                    <div class="logs-card-header">
+                        <div class="header-main">
+                            <h2>Expense Logs History</h2>
+                            <span class="count-badge" id="logs-count">0 items</span>
+                        </div>
+                        
+                        <!-- Filtering Controllers -->
+                        <div class="filter-controls">
+                            <div class="filter-group">
+                                <label for="filter-type">Type</label>
+                                <select id="filter-type">
+                                    <option value="ALL">All Types</option>
+                                    <option value="income">📈 Income</option>
+                                    <option value="expense">📉 Expense</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-month">Month</label>
+                                <input type="month" id="filter-month">
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-category">Category</label>
+                                <select id="filter-category">
+                                    <option value="ALL">All Categories</option>
+                                    <!-- Dynamic Options from Javascript -->
+                                </select>
+                            </div>
+                            <button id="reset-filters-btn" class="btn btn-secondary btn-icon" title="Reset Filters">
+                                🔄
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table container -->
+                    <div class="table-responsive">
+                        <table class="logs-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Notes</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-tbody">
+                                <!-- Dynamic Expense Logs Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="no-logs-msg" class="empty-table-state">
+                        <div class="empty-icon">📁</div>
+                        <p>No logs found matching the selected criteria. Try adjusting the filters or record a new transaction!</p>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+        
+        <footer class="app-footer">
+            <p>&copy; 2026 Expense Tracker Inc. Made with premium styling tokens and optimized layouts.</p>
+        </footer>
+    </div>
+    <!-- Interactive Front-end Script -->
+    <script src="static/app.js"></script>
+</body>
+</html>
